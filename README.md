@@ -5,3 +5,5 @@ Statistical study of parameters that may be utilized as triggers for a sounding 
 To run a parameter search assuming FOXSI launches first, with HI-C launching 1 minute later: perform tests in the `BOTH_PARAMSEARCH` folder.
 
 To run a parameter search assuming only FOXSI or Hi-C are launching: choose either the `FOXSI_PARAMSEARCH` or  `HIC_PARAMSEARCH` folder. 
+
+yay!!
