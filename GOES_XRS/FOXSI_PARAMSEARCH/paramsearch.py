@@ -10,7 +10,7 @@ import os
 
 class ParameterSearch:
     
-    flare_fits = '../GOES_XRS_historical.fits'
+    flare_fits = '../../../GOES_XRS_computed_params.fits'
     
     def __init__(self, success_flux_key, success_flux_value, parameter_names, parameter_units, parameter_arrays, parameter_combinations, directory):
         '''Saves .fits file data to Astropy Table structure (works similarly to regular .fits, but also lets you

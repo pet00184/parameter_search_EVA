@@ -20,7 +20,7 @@ class SaveScores:
     these separate scores into one large .csv file.
     '''
     
-    flare_fits = '../GOES_XRS_historical.fits'
+    flare_fits = '../../../GOES_XRS_computed_params.fits'
     
     def __init__(self, out_dir, success_flux_key, success_flux_value, launch_df_list, tag, param_names, param_units):
         fitsfile = fits.open(self.flare_fits)
@@ -36,6 +36,9 @@ class SaveScores:
         self.success_flux_value = success_flux_value
         
     def loop_through_param_combos(self):
+        ''' This is the function that is actually called when doing this in run_paramsearch.py. For each parameter
+        combination, a new row of a .csv file is appended with the scores listed below in self.score_df.
+        '''
         self.score_df = pd.DataFrame(columns=('Precision', 'Recall', 'Gordon', 'LaunchTriggerRatio', 'PeakRatio', 'Fbeta', 'Accuracy', 'TN', 'TN_canc', 'FN', 'FN_canc', 
                         f'FP_{self.success_flux_key}', f'FP_no{self.success_flux_key}', f'TP_no{self.success_flux_key}', 'TP'))
         self.append_param_names_and_units()
