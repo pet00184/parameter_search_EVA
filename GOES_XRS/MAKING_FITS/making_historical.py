@@ -8,8 +8,8 @@ from astropy.io import fits
 from sunpy import timeseries as ts
 from sunkit_instruments import goes_xrs
 
-flare_summary_file = 'sci_xrsf-l2-flsum_g16_s20170209_e20240217_v2-2-0.nc'
-xrs_file = 'sci_xrsf-l2-avg1m_g16_s20170207_e20240217_v2-2-0.nc'
+flare_summary_file = 'sci_xrsf-l2-flsum_g16_s20170209_e20241115_v2-2-0.nc'
+xrs_file = 'sci_xrsf-l2-avg1m_g16_s20170207_e20241115_v2-2-0.nc'
 
 class MakingHistoricalDataframe:
     
@@ -19,7 +19,6 @@ class MakingHistoricalDataframe:
     xrsa_list = []
     xrsb_list = []
     time_list = []
-    # em_list = []
     UTC_time_list = []
     peak_time_list = []
     UTC_peak_time_list = []
@@ -35,13 +34,8 @@ class MakingHistoricalDataframe:
         self.xrs_data = nc.Dataset(xrs_file)
         self.fs_data = nc.Dataset(flare_summary_file)
         
-    def make_em_df(self):
-        goes_ts = ts.TimeSeries(self.xrs_file) 
-        self.goes_temp_emiss = goes_xrs.calculate_temperature_em(goes_ts)
-        self.goes_em = self.goes_temp_emiss.to_dataframe()
-        #print(self.goes_em['emission_measure'])
-        
     def make_flare_tuple(self):
+        ''' Saves the start and end index for each flare'''
         flare_ids = self.fs_data['flare_id'][:]
         self.flare_id_arr = sorted(set(flare_ids))
         self.flare_tuple = []
@@ -50,6 +44,7 @@ class MakingHistoricalDataframe:
             self.flare_tuple.append([this_flare[0], this_flare[-1]])
             
     def parse_xrs_data(self):
+        ''' Parses out the GOES XRSA, XRSB and time lightcurves for each flare.'''
         for i, index_range in enumerate(self.flare_tuple):
             start = index_range[0]
             end = index_range[1]
@@ -58,8 +53,6 @@ class MakingHistoricalDataframe:
             self.xrsb_list.append(np.array(self.xrs_data['xrsb_flux_observed'][xrs_start-15:xrs_end+15].data))
             self.xrsa_list.append(np.array(self.xrs_data['xrsa_flux_observed'][xrs_start-15:xrs_end+15].data))
             self.time_list.append(np.array(self.xrs_data['time'][xrs_start-15:xrs_end+15].data))
-            # self.em_list.append(np.array(self.goes_em['emission_measure'][xrs_start-15:xrs_end+15]))
-            # print(np.array(self.goes_em['emission_measure'][xrs_start-15:xrs_end+15]))
             
     def include_flare_class(self):
         for i, index_range in enumerate(self.flare_tuple):
@@ -109,8 +102,6 @@ if __name__ == '__main__':
     test = MakingHistoricalDataframe(flare_summary_file, xrs_file)
     test.make_flare_tuple()
     print('flare tuple done')
-    # test.make_em_df()
-    # print('emission measures done')
     test.parse_xrs_data()
     print('parsing xrs data done')
     test.include_flare_class()

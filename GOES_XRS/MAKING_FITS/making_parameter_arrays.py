@@ -30,97 +30,100 @@ class MakingParamArrays:
         self.column_names.append('Increase above Background')
         self.column_names.append('Increase above Background Fraction')
     
-    def save_differences_between_further_points(self, n):
-        diff_xrsb_list = []
-        diff_xrsb_pct_list = []
-        for arr in self.xrsb:
-            diff_xrsb = arr[n:] - arr[:-n]
-            diff_xrsb = np.concatenate([np.full(n, math.nan), diff_xrsb]) #appending the right amount of zeros to front to make the indices correct
-            diff_xrsb_list.append(diff_xrsb)
-            diff_xrsb_pct = []
-            for i, diffy in enumerate(diff_xrsb):
-                diff_xrsb_pct.append(diffy/arr[i]*100)
-            diff_xrsb_pct_list.append(diff_xrsb_pct)
-        self.columns.append(diff_xrsb_list)
-        self.column_names.append(f'XRSB {n}-min Differences')
-        self.columns.append(diff_xrsb_pct_list)
-        self.column_names.append(f'XRSB {n}-min Differences %')
-        diff_xrsa_list = []
-        diff_xrsa_pct_list = []
-        for arr in self.xrsa:
-            diff_xrsa = arr[n:] - arr[:-n]
-            diff_xrsa = np.concatenate([np.full(n, math.nan), diff_xrsa])
-            diff_xrsa_list.append(diff_xrsa)
-            diff_xrsa_pct = []
-            for i, diffy in enumerate(diff_xrsa):
-                diff_xrsa_pct.append(diffy/arr[i]*100)
-            diff_xrsa_pct_list.append(diff_xrsa_pct)
-        self.columns.append(diff_xrsa_list)
-        self.column_names.append(f'XRSA {n}-min Differences')
-        self.columns.append(diff_xrsa_pct_list)
-        self.column_names.append(f'XRSA {n}-min Differences %')
-        #also doing temp differences:
-        temp_diff_list = []
-        for i, arr in enumerate(diff_xrsa_list):
-            temp = arr/diff_xrsb_list[i]
-            temp_diff_list.append(temp)
-        self.columns.append(temp_diff_list)
-        self.column_names.append(f'Temp {n}-min Differences')
+    # def save_differences_between_further_points(self, n):
+    #     diff_xrsb_list = []
+    #     diff_xrsb_pct_list = []
+    #     for arr in self.xrsb:
+    #         diff_xrsb = arr[n:] - arr[:-n]
+    #         diff_xrsb = np.concatenate([np.full(n, math.nan), diff_xrsb]) #appending the right amount of zeros to front to make the indices correct
+    #         diff_xrsb_list.append(diff_xrsb)
+    #         diff_xrsb_pct = []
+    #         for i, diffy in enumerate(diff_xrsb):
+    #             diff_xrsb_pct.append(diffy/arr[i]*100)
+    #         diff_xrsb_pct_list.append(diff_xrsb_pct)
+    #     self.columns.append(diff_xrsb_list)
+    #     self.column_names.append(f'XRSB {n}-min Differences')
+    #     self.columns.append(diff_xrsb_pct_list)
+    #     self.column_names.append(f'XRSB {n}-min Differences %')
+    #     diff_xrsa_list = []
+    #     diff_xrsa_pct_list = []
+    #     for arr in self.xrsa:
+    #         diff_xrsa = arr[n:] - arr[:-n]
+    #         diff_xrsa = np.concatenate([np.full(n, math.nan), diff_xrsa])
+    #         diff_xrsa_list.append(diff_xrsa)
+    #         diff_xrsa_pct = []
+    #         for i, diffy in enumerate(diff_xrsa):
+    #             diff_xrsa_pct.append(diffy/arr[i]*100)
+    #         diff_xrsa_pct_list.append(diff_xrsa_pct)
+    #     self.columns.append(diff_xrsa_list)
+    #     self.column_names.append(f'XRSA {n}-min Differences')
+    #     self.columns.append(diff_xrsa_pct_list)
+    #     self.column_names.append(f'XRSA {n}-min Differences %')
+        # #also doing temp differences:
+        # temp_diff_list = []
+        # for i, arr in enumerate(diff_xrsa_list):
+        #     temp = arr/diff_xrsb_list[i]
+        #     temp_diff_list.append(temp)
+        # self.columns.append(temp_diff_list)
+        # self.column_names.append(f'Temp {n}-min Differences')
         
-    def save_temp(self):
-        temp = self.xrsa/self.xrsb
-        self.columns.append(temp)
-        self.column_names.append('Temperature (xrsa/xrsb)')
+    # def save_temp(self):
+    #     temp = self.xrsa/self.xrsb
+    #     self.columns.append(temp)
+    #     self.column_names.append('Temperature (xrsa/xrsb)')
         
-    def make_table(self):
-        self.t = Table(self.columns, names=self.column_names)
-        print(self.t.info)
-        self.t.write('GOES_computed_parameters.fits', overwrite=True)
+    # def make_table(self):
+    #     self.t = Table(self.columns, names=self.column_names)
+    #     print(self.t.info)
+    #     self.t.write('GOES_computed_parameters.fits', overwrite=True)
+        
+    def add_columns_to_fits(self):
+        
 
        
-def add_c5_10min_bool_and_em():
-    ''' adding function to add on the C5 flux for 10 min or longer bool. This is what we will use for the true/false
-    in the new ROC curves for deciding if the flare is viable or not. (will change the C5 to C5 10 min or longer)
-    '''
-    flare_fits = 'GOES_XRS_historical_testerem.fits'
-    fitsfile = fits.open(flare_fits)
-    data = Table(fitsfile[1].data)[:]
-    print(data.columns)
-    header = fitsfile[1].header
-    xrsb = data['xrsb'][:]
-    
-    c5_10min_bool_list = []
-    c5_thresh = 5e-6
-    minutes = 10
-    for flare in xrsb:
-        above_c5_arr = np.flatnonzero(np.convolve(flare>c5_thresh, np.ones(minutes, dtype=int),'valid')>=minutes)
-        if len(above_c5_arr) > 0:
-            c5_10min_bool_list.append(True)
-        else:
-            c5_10min_bool_list.append(False)
-    
-    #adding column to fits: 
-    data.add_column(c5_10min_bool_list, name='above C5 10min', index=9)
-    print(data.columns)
-    #data.write('GOES_XRS_historical_finalversion.fits', overwrite=True)
-    
-    em = data['em'][:]
-    
-    for n in [1,2,3,4,5]:
-        diff_em_list = []
-        diff_em_pct_list = []
-        for arr in em:
-            diff_em = arr[n:] - arr[:-n]
-            diff_em = np.concatenate([np.full(n, math.nan), diff_em]) #appending the right amount of zeros to front to make the indices correct
-            diff_em_list.append(diff_em)
-            diff_em_pct = []
-            for i, diffy in enumerate(diff_em):
-                diff_em_pct.append(diffy/arr[i]*100)
-            diff_em_pct_list.append(diff_em_pct)
-        data.add_column(diff_em_list, name=f'{n}-min em diff')
-        data.add_column(diff_em_pct_list, name=f'{n}-min em diff %')
-        print(data.columns)
-    data.write('GOES_XRS_historical_finalversion.fits', overwrite=True)
+# def add_c5_10min_bool_and_em():
+#     ''' adding function to add on the C5 flux for 10 min or longer bool. This is what we will use for the true/false
+#     in the new ROC curves for deciding if the flare is viable or not. (will change the C5 to C5 10 min or longer)
+#     '''
+#     flare_fits = 'GOES_XRS_historical_testerem.fits'
+#     fitsfile = fits.open(flare_fits)
+#     data = Table(fitsfile[1].data)[:]
+#     print(data.columns)
+#     header = fitsfile[1].header
+#     xrsb = data['xrsb'][:]
+#
+#     c5_10min_bool_list = []
+#     c5_thresh = 5e-6
+#     minutes = 10
+#     for flare in xrsb:
+#         above_c5_arr = np.flatnonzero(np.convolve(flare>c5_thresh, np.ones(minutes, dtype=int),'valid')>=minutes)
+#         if len(above_c5_arr) > 0:
+#             c5_10min_bool_list.append(True)
+#         else:
+#             c5_10min_bool_list.append(False)
+#
+#     #adding column to fits:
+#     data.add_column(c5_10min_bool_list, name='above C5 10min', index=9)
+#     print(data.columns)
+#     #data.write('GOES_XRS_historical_finalversion.fits', overwrite=True)
+#
+#     em = data['em'][:]
+#
+#     for n in [1,2,3,4,5]:
+#         diff_em_list = []
+#         diff_em_pct_list = []
+#         for arr in em:
+#             diff_em = arr[n:] - arr[:-n]
+#             diff_em = np.concatenate([np.full(n, math.nan), diff_em]) #appending the right amount of zeros to front to make the indices correct
+#             diff_em_list.append(diff_em)
+#             diff_em_pct = []
+#             for i, diffy in enumerate(diff_em):
+#                 diff_em_pct.append(diffy/arr[i]*100)
+#             diff_em_pct_list.append(diff_em_pct)
+#         data.add_column(diff_em_list, name=f'{n}-min em diff')
+#         data.add_column(diff_em_pct_list, name=f'{n}-min em diff %')
+#         print(data.columns)
+#     data.write('GOES_XRS_historical_finalversion.fits', overwrite=True)
     
 # def add_em_differences(n):
 #     flare_fits = 'GOES_XRS_historical_testerem.fits'
