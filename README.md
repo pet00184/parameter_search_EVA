@@ -1,46 +1,57 @@
 # Parameter Search of Historical GOES XRS Data
-
-Statistical study of parameters that may be utilized as triggers for a sounding rocket launch. The parameter search utilizes the specific timing of the FOXSI/HI-C rocket launch timing, and utilizes the FOXSI/HI-C science goals as success criteria. For all combinations of parameters, results as to what FOXSI/HI-C would launch on and observe are simulated for every trigger combination, tested on approx. 10,500 flares. 
-
-To run a parameter search assuming FOXSI launches first, with HI-C launching 1 minute later: perform tests in the `BOTH_PARAMSEARCH` folder.
-
-To run a parameter search assuming only FOXSI or Hi-C are launching: choose either the `FOXSI_PARAMSEARCH` or  `HIC_PARAMSEARCH` folder. 
-
-yay!!
-
-update this down here: 
-
-outline: 
-- overview of the repository
-- instructions on how to run a parameter search
-- overview of how the parameter search works
-- what you should end up with
-
-
-basically tell her to just use the FOXSI repo, and make sure it works!!
-
-notes: 
-- get rid of the paper plots folder here
-- make a new folder to store the both and hic parameter searches in
-- make a different folder for making the GOES historical fits
-- download the main science files that you want and remake the parameter stuff on your own, and just put those on the google drive so eva doens't have to do it themselves.
-- maybe see if you can just do one big FITS file....???? 
-
-## Overview of the Paramter Search Code
 ---
-The following code runs a statistical study of GOES XRS parameters to be utilized as triggers for a sounding rocket launch. The specific timing of the FOXSI/HiC launches are hard coded into the search, as well as the instruments success criteria. For all combinations of parameters, results as to what FOXSI/HI-C would launch on and observe are simulated for every trigger combination, tested on approx. 10,500 flares. 
+The following code runs a statistical study of GOES XRS parameters to be utilized as triggers for a sounding rocket launch. The specific timing of the FOXSI/HiC launches are hard coded into the search, as well as the instruments success criteria. For all combinations of parameters, results as to what FOXSI/HI-C would launch on and observe are simulated for every trigger combination, tested on approx. 13,500 flares. 
 
-Parameter search runs may be performed assuming both rockets are launching and need their success criteria met, and also on independent rockets (assuming they are launching by themselves). **For this work, we should assume that FOXSI-5 will be launching independently**. The parameter searches can be found in the following folders: 
 
-- `BOTH_PARAMSEARCH`: folder that assumes both FOXSI and HiC are launching. This parameter search was utilized for the FOXSI-4 and HiC joint launch in April 2024. 
-- `FOXSI_PARAMSEARCH`: folder that assumes only FOXSI is launching. **This is the folder we should use for this work!!**
-- `HIC_PARAMSEARCH`: for completion, we also have a folder that assumes only HiC is launching. 
-
-Working with only one rocket will make things a bit easier this time around, since we don't need to be looking at results for two separate rockets with separate goals. This time around, we will only need to focus on what parameters optimize the FOXSI goals of observign a large solar flare as early in the flare as possible.
-
-## How to run the parameter Search
+##Setup: 
 ---
-### Step #1: Download the GOES Dataset
-GOES has a flare list and historical data that is constantly being updated. Every few months, I redownload the data and parse out all the flares since 2017, so that we get more flares to work with. **To speed up the process, the following necessary FITS files have been updated and are shared on Google Drive for you to download**:
+### Step 1: Download the Repository
+The way I like to do this is through running `git clone https://github.com/pet00184/parameter_search_EVA.git` in my terminal. I know you said you have another way to do this, so however is best for you to get it on your local machine works!
 
-- `GOES_XRS_historical.fits`: This is the main 
+### Step 2: Download Python
+If you haven't already done this, you can either download python from the internet, or in your terminal run `brew install python`. 
+
+I generally like to use VSCode when working on this stuff, which might be a good application to download if you don't already use it.
+
+### Step 3: Download dependent packages 
+I made a requirements.txt file that should download all the python packages you need at once. To do this, run `pip install -r requirements.txt` in your terminal.
+
+If you start trying to run things and get a "module not found" error, I probably missed a package. Do `pip install packagename` to fix that.
+
+### Step 4: Download the GOES XRS .FITS file from Google Drive
+Making the FITS file takes a while and can be annoying to do. It also is too big to put on Github. Instead, I suggest downloading it from Google Drive, under the [Eva Parameter Search Work](https://drive.google.com/drive/u/0/folders/1DVOGmY8eDlSSePoL9E8wmtNEeaWN2LjG) file I shared with you. The name of the file is `GOES_XRS_computed_params.fits`. Put this file in the same folder as the github `parameter_search_EVA` folder.
+
+## File Organization
+---
+Below is a short overview of what is in all the folders. All of the parameter Search is contained in the `GOES_XRS` folder.
+
+- `FOXSI_PARAMSEARCH`: This is where all the parameter search code that we will be using is stored! For your work, we are only going to assume FOXSI is launching. I will go through this folder in more detail in the next section.
+- `OTHER_PARAMSEARCHES`: For the April 2024 flare campaign, another sounding rocket Hi-C launched as well. In this folder are parameter searches that only look at Hi-C's success criteria, and look at both FOXSI and Hi-C simultaneously.
+- `MAKING_FITS`: This is where the code to assemble the FITS file is located. This may be useful to look at once we look more into getting EVE data ready for a parmeter search, but I would generally ignore it for now.
+- `DATA_SUMMARY_PLOTS`: These are some overview plots of the GOES XRS data itself. Could be useful to look at to get a better idea of what the data you are working with looks like!
+
+## Running the Parameter Search
+---
+To run the parameter search, go into the `FOXSI_PARAMSEARCH` file. 
+
+The first script to run is `run_paramsearch.py`. Within this file, you will find a dictionary with all the potential parameters to test. 
+	- To run different parameter combinations, you will need to edit which parameters you are calling within this file. (We can go over this more in person!) 
+	- **For now, there is a basic parameter search with only XRSB data setup, so you can run that first**.
+	- You should have a lot of things printing out in your terminal when you run this. If you get a "leaked semaphore object" error at the end, you can just ctrl + c. 
+	
+Once the parameter search has been run, you will end up with a new folder with the following setup: `RESULTS/C5/xrsb`. Within that folder, you should have the following: 
+	 - `AllParameterCombinations.csv`: This is a .csv file with all the scores for each parameter combination you test. This file should be small for this XRSB example, but will get very large when doing multiple parameter runs!
+	 - `Launches`: This folder has the specific results of which flares were launched on for every parameter combination. I would generally ignore this.
+	 - `FOXSI_Plots`: This is where the plots will show up. After running `run_paramsearch.py` you will get Precision-Recall plots, which can be used to see which specific parameter combinations look the best.
+	 
+If you see a specific parameter combination that you want to get more information on, you can now run the `run_combination_plotting.py` script. 
+	- Just like `run_paramsearch.py`, you will need to go into the file itself and make sure you are listing the same parameters.
+	
+Once combination plotting has been run, a new folder with additional plots for that specific parameter combination will be found under `RESULTS/C5/xrsb`. 
+
+*Once the XRSB example works and you have had a look through the code, feel free to try different parameter combinations. You will end up with a separate folder for every different combination you try.*
+
+
+	 
+
+
