@@ -35,17 +35,17 @@ Below is a short overview of what is in all the folders. All of the parameter Se
 To run the parameter search, go into the `FOXSI_PARAMSEARCH` file. 
 
 The first script to run is `run_paramsearch.py`. Within this file, you will find a dictionary with all the potential parameters to test. 
-	- To run different parameter combinations, you will need to edit which parameters you are calling within this file. (We can go over this more in person!) 
-	- **For now, there is a basic parameter search with only XRSB data setup, so you can run that first**.
-	- You should have a lot of things printing out in your terminal when you run this. If you get a "leaked semaphore object" error at the end, you can just ctrl + c. 
+1. To run different parameter combinations, you will need to edit which parameters you are calling within this file. (We can go over this more in person!) 
+2. **For now, there is a basic parameter search with only XRSB data setup, so you can run that first**.
+3. You should have a lot of things printing out in your terminal when you run this. If you get a "leaked semaphore object" error at the end, you can just ctrl + c. 
 	
 Once the parameter search has been run, you will end up with a new folder with the following setup: `RESULTS/C5/xrsb`. Within that folder, you should have the following: 
-	 - `AllParameterCombinations.csv`: This is a .csv file with all the scores for each parameter combination you test. This file should be small for this XRSB example, but will get very large when doing multiple parameter runs!
-	 - `Launches`: This folder has the specific results of which flares were launched on for every parameter combination. I would generally ignore this.
-	 - `FOXSI_Plots`: This is where the plots will show up. After running `run_paramsearch.py` you will get Precision-Recall plots, which can be used to see which specific parameter combinations look the best.
+1. `AllParameterCombinations.csv`: This is a .csv file with all the scores for each parameter combination you test. This file should be small for this XRSB example, but will get very large when doing multiple parameter runs!
+2. `Launches`: This folder has the specific results of which flares were launched on for every parameter combination. I would generally ignore this.
+3. `FOXSI_Plots`: This is where the plots will show up. After running `run_paramsearch.py` you will get Precision-Recall plots, which can be used to see which specific parameter combinations look the best.
 	 
 If you see a specific parameter combination that you want to get more information on, you can now run the `run_combination_plotting.py` script. 
-	- Just like `run_paramsearch.py`, you will need to go into the file itself and make sure you are listing the same parameters.
+1. Just like `run_paramsearch.py`, you will need to go into the file itself and make sure you are listing the same parameters.
 	
 Once combination plotting has been run, a new folder with additional plots for that specific parameter combination will be found under `RESULTS/C5/xrsb`. 
 
