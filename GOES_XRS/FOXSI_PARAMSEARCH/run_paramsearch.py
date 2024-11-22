@@ -177,8 +177,8 @@ if __name__ == '__main__':
     out_dir = os.path.join('RESULTS', flux_key, savestring)
     score_csv = 'AllParameterScores.csv'
     #### actually running the parameter search
-    # run_multiprocessing_paramsearch(key, out_dir, flux_key)
-    # ### saving the scores
-    # run_multiprocessing_savescores(key, out_dir, flux_key)
+    run_multiprocessing_paramsearch(key, out_dir, flux_key)
+    ### saving the scores
+    run_multiprocessing_savescores(key, out_dir, flux_key)
     ### basic plotting, which will give us a PR curve to compare all the parameter combinations
     pl.make_summary_plots(key, flux_key, nice_keys_list, score_csv, out_dir, 'FOXSI_Plots')

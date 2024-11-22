@@ -2,4 +2,3 @@ astropy
 matplotlib
 pandas
 numpy
-functools
